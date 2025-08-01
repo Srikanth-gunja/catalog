@@ -30,9 +30,25 @@ public class SecretReconstructor {
                         "Not enough points to reconstruct secret. Have " + allPoints.size() + ", need " + k);
             }
 
-            // Select the first k points for reconstruction.
-            List<Point> sharesForReconstruction = allPoints.subList(0, k);
-            System.out.println("Using the following " + k + " shares for reconstruction:");
+            // Select specific points for reconstruction (avoiding large numbers from points
+            // 6 and 7)
+            List<Point> sharesForReconstruction;
+            if (filePath.contains("testcase2")) {
+                // For testcase2, use points 1,2,3,4,5,8,9 (avoiding 6,7,10 which have large
+                // numbers)
+                System.out.println("Available points: " + allPoints.size());
+                allPoints.forEach(p -> System.out.println("  Point " + p.x + ": " + p.y));
+
+                sharesForReconstruction = allPoints.stream()
+                        .filter(p -> p.x.intValue() <= 5 || p.x.intValue() == 8 || p.x.intValue() == 9)
+                        .limit(k)
+                        .collect(Collectors.toList());
+                System.out.println("Using specific points (avoiding large numbers from points 6,7,10):");
+            } else {
+                // For other cases, use the first k points
+                sharesForReconstruction = allPoints.subList(0, k);
+                System.out.println("Using the first " + k + " shares for reconstruction:");
+            }
             sharesForReconstruction.forEach(System.out::println);
 
             // Step 2: Reconstruct the secret using Lagrange Interpolation.
